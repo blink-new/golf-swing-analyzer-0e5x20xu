@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { VideoPlayer } from './VideoPlayer'
+import { SwingTempoAnalyzer } from './SwingTempoAnalyzer'
 import { 
   Target, 
   Clock, 
@@ -18,7 +19,11 @@ import {
   ArrowRight,
   Activity,
   Crosshair,
-  Wind
+  Wind,
+  Compass,
+  RotateCcw,
+  Move3D,
+  Gauge
 } from 'lucide-react'
 
 interface AnalysisData {
@@ -46,6 +51,10 @@ interface AnalysisData {
     downswingSpeed: number
     impactPosition: number
     weightTransfer: number
+    attackAngle: number
+    swingPath: number
+    clubFaceAngle: number
+    smashFactor: number
   }
   feedback: string[]
 }
@@ -168,7 +177,7 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
         </CardContent>
       </Card>
 
-      {/* Video Analysis */}
+      {/* Video Analysis and Tempo */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -237,6 +246,9 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
         </Card>
       </div>
 
+      {/* Swing Tempo Analysis */}
+      <SwingTempoAnalyzer videoUrl={data.videoUrl} />
+
       {/* Detailed Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -303,6 +315,77 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
             <p className="text-xs text-gray-600">
               {data.swingMetrics.weightTransfer >= 85 ? 'Excellent shift' : 
                data.swingMetrics.weightTransfer >= 70 ? 'Good transfer' : 'Work on balance'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Advanced Swing Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Move3D className="w-4 h-4 mr-2 text-primary" />
+              Attack Angle
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.attackAngle > 0 ? '+' : ''}{data.swingMetrics.attackAngle.toFixed(1)}°</div>
+            <Progress value={Math.abs(data.swingMetrics.attackAngle) <= 3 ? 100 : 50} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {Math.abs(data.swingMetrics.attackAngle) <= 3 ? 'Optimal angle' : 
+               data.swingMetrics.attackAngle > 3 ? 'Too steep' : 'Too shallow'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Compass className="w-4 h-4 mr-2 text-primary" />
+              Swing Path
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.swingPath > 0 ? '+' : ''}{data.swingMetrics.swingPath.toFixed(1)}°</div>
+            <Progress value={Math.abs(data.swingMetrics.swingPath) <= 2 ? 100 : 50} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {Math.abs(data.swingMetrics.swingPath) <= 2 ? 'On target' : 
+               data.swingMetrics.swingPath > 2 ? 'Out-to-in' : 'In-to-out'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <RotateCcw className="w-4 h-4 mr-2 text-primary" />
+              Club Face
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.clubFaceAngle > 0 ? '+' : ''}{data.swingMetrics.clubFaceAngle.toFixed(1)}°</div>
+            <Progress value={Math.abs(data.swingMetrics.clubFaceAngle) <= 2 ? 100 : 50} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {Math.abs(data.swingMetrics.clubFaceAngle) <= 2 ? 'Square at impact' : 
+               data.swingMetrics.clubFaceAngle > 2 ? 'Open face' : 'Closed face'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Gauge className="w-4 h-4 mr-2 text-primary" />
+              Smash Factor
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.smashFactor.toFixed(2)}</div>
+            <Progress value={data.swingMetrics.smashFactor >= 1.4 ? 100 : (data.swingMetrics.smashFactor / 1.5) * 100} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {data.swingMetrics.smashFactor >= 1.4 ? 'Excellent efficiency' : 
+               data.swingMetrics.smashFactor >= 1.3 ? 'Good contact' : 'Improve strike'}
             </p>
           </CardContent>
         </Card>

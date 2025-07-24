@@ -35,6 +35,10 @@ interface AnalysisData {
     downswingSpeed: number
     impactPosition: number
     weightTransfer: number
+    attackAngle: number
+    swingPath: number
+    clubFaceAngle: number
+    smashFactor: number
   }
   feedback: string[]
 }
@@ -81,7 +85,11 @@ function App() {
           backswingLength: Math.floor(Math.random() * 30) + 90,  // 90-120 degrees
           downswingSpeed: Math.floor(Math.random() * 20) + 85,   // 85-105 mph
           impactPosition: Math.floor(Math.random() * 25) + 75,   // 75-100
-          weightTransfer: Math.floor(Math.random() * 30) + 70    // 70-100
+          weightTransfer: Math.floor(Math.random() * 30) + 70,   // 70-100
+          attackAngle: (Math.random() - 0.5) * 8,                // -4 to +4 degrees
+          swingPath: (Math.random() - 0.5) * 6,                  // -3 to +3 degrees
+          clubFaceAngle: (Math.random() - 0.5) * 8,              // -4 to +4 degrees
+          smashFactor: 1.2 + Math.random() * 0.3                 // 1.2-1.5
         },
         feedback: [
           "Your swing plane is slightly over the ideal line - focus on a more inside takeaway",
@@ -89,7 +97,11 @@ function App() {
           "Ball spin rate is optimal for your swing speed - great control",
           "Consider working on weight transfer for more consistent ball flight",
           "Your club face is slightly open at impact - work on rotation through the ball",
-          "Launch angle is in the optimal range for maximum distance"
+          "Launch angle is in the optimal range for maximum distance",
+          "Attack angle shows good descending blow - maintain this for iron shots",
+          "Swing path is slightly out-to-in - work on swinging more from the inside",
+          "Smash factor indicates efficient energy transfer - excellent contact quality",
+          "Tempo analysis shows good rhythm - maintain this consistency under pressure"
         ]
       }
       setAnalysisData(mockAnalysis)
