@@ -18,7 +18,23 @@ interface AnalysisData {
     tempo: number
     posture: number
     followThrough: number
+    ballStriking: number
+    swingPlane: number
+    clubFace: number
     overall: number
+  }
+  ballFlight: {
+    distance: number
+    accuracy: number
+    spin: number
+    launch: number
+    straightness: number
+  }
+  swingMetrics: {
+    backswingLength: number
+    downswingSpeed: number
+    impactPosition: number
+    weightTransfer: number
   }
   feedback: string[]
 }
@@ -49,13 +65,31 @@ function App() {
           tempo: Math.floor(Math.random() * 30) + 70,
           posture: Math.floor(Math.random() * 25) + 75,
           followThrough: Math.floor(Math.random() * 35) + 65,
+          ballStriking: Math.floor(Math.random() * 25) + 75,
+          swingPlane: Math.floor(Math.random() * 30) + 70,
+          clubFace: Math.floor(Math.random() * 35) + 65,
           overall: Math.floor(Math.random() * 20) + 75
         },
+        ballFlight: {
+          distance: Math.floor(Math.random() * 50) + 200, // 200-250 yards
+          accuracy: Math.floor(Math.random() * 30) + 70,   // 70-100%
+          spin: Math.floor(Math.random() * 2000) + 2000,   // 2000-4000 RPM
+          launch: Math.floor(Math.random() * 8) + 8,       // 8-16 degrees
+          straightness: Math.floor(Math.random() * 30) + 70 // 70-100
+        },
+        swingMetrics: {
+          backswingLength: Math.floor(Math.random() * 30) + 90,  // 90-120 degrees
+          downswingSpeed: Math.floor(Math.random() * 20) + 85,   // 85-105 mph
+          impactPosition: Math.floor(Math.random() * 25) + 75,   // 75-100
+          weightTransfer: Math.floor(Math.random() * 30) + 70    // 70-100
+        },
         feedback: [
-          "Your backswing tempo is excellent - maintain this rhythm",
-          "Consider keeping your head more stable during the swing",
-          "Great hip rotation through impact",
-          "Work on extending your follow-through for more power"
+          "Your swing plane is slightly over the ideal line - focus on a more inside takeaway",
+          "Excellent ball striking with solid contact at impact",
+          "Ball spin rate is optimal for your swing speed - great control",
+          "Consider working on weight transfer for more consistent ball flight",
+          "Your club face is slightly open at impact - work on rotation through the ball",
+          "Launch angle is in the optimal range for maximum distance"
         ]
       }
       setAnalysisData(mockAnalysis)

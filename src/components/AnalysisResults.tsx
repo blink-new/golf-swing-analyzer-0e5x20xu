@@ -12,7 +12,13 @@ import {
   Share2,
   CheckCircle,
   AlertTriangle,
-  Info
+  Info,
+  Zap,
+  RotateCw,
+  ArrowRight,
+  Activity,
+  Crosshair,
+  Wind
 } from 'lucide-react'
 
 interface AnalysisData {
@@ -23,7 +29,23 @@ interface AnalysisData {
     tempo: number
     posture: number
     followThrough: number
+    ballStriking: number
+    swingPlane: number
+    clubFace: number
     overall: number
+  }
+  ballFlight: {
+    distance: number
+    accuracy: number
+    spin: number
+    launch: number
+    straightness: number
+  }
+  swingMetrics: {
+    backswingLength: number
+    downswingSpeed: number
+    impactPosition: number
+    weightTransfer: number
   }
   feedback: string[]
 }
@@ -55,6 +77,18 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
     return <Info className="w-4 h-4 text-blue-600" />
   }
 
+  const getSpinDescription = (spin: number) => {
+    if (spin < 2000) return { label: 'Low Spin', color: 'text-blue-600', desc: 'Good for distance' }
+    if (spin < 3000) return { label: 'Optimal Spin', color: 'text-green-600', desc: 'Perfect balance' }
+    return { label: 'High Spin', color: 'text-red-600', desc: 'May reduce distance' }
+  }
+
+  const getLaunchDescription = (launch: number) => {
+    if (launch < 10) return { label: 'Low Launch', color: 'text-red-600' }
+    if (launch < 15) return { label: 'Optimal Launch', color: 'text-green-600' }
+    return { label: 'High Launch', color: 'text-yellow-600' }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -64,7 +98,7 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
             <div>
               <CardTitle className="flex items-center space-x-2">
                 <Target className="w-5 h-5 text-primary" />
-                <span>Swing Analysis Results</span>
+                <span>Comprehensive Swing Analysis</span>
               </CardTitle>
               <CardDescription>
                 Analysis completed on {data.timestamp.toLocaleDateString()} at {data.timestamp.toLocaleTimeString()}
@@ -101,33 +135,33 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
                 {getScoreBadge(data.scores.overall).label}
               </Badge>
             </div>
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-3">
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Tempo</span>
-                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.tempo)}`}>
-                    {data.scores.tempo}/100
+                  <span className="text-sm font-medium">Swing Plane</span>
+                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.swingPlane)}`}>
+                    {data.scores.swingPlane}/100
                   </span>
                 </div>
-                <Progress value={data.scores.tempo} className="h-2" />
+                <Progress value={data.scores.swingPlane} className="h-2" />
               </div>
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Posture</span>
-                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.posture)}`}>
-                    {data.scores.posture}/100
+                  <span className="text-sm font-medium">Ball Striking</span>
+                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.ballStriking)}`}>
+                    {data.scores.ballStriking}/100
                   </span>
                 </div>
-                <Progress value={data.scores.posture} className="h-2" />
+                <Progress value={data.scores.ballStriking} className="h-2" />
               </div>
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Follow Through</span>
-                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.followThrough)}`}>
-                    {data.scores.followThrough}/100
+                  <span className="text-sm font-medium">Club Face Control</span>
+                  <span className={`text-sm font-semibold ${getScoreColor(data.scores.clubFace)}`}>
+                    {data.scores.clubFace}/100
                   </span>
                 </div>
-                <Progress value={data.scores.followThrough} className="h-2" />
+                <Progress value={data.scores.clubFace} className="h-2" />
               </div>
             </div>
           </div>
@@ -138,46 +172,194 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Analyzed Video</CardTitle>
-            <CardDescription>Your swing with AI analysis overlay</CardDescription>
+            <CardTitle>Analyzed Video with Overlays</CardTitle>
+            <CardDescription>Your swing with AI analysis overlay showing swing plane and ball path</CardDescription>
           </CardHeader>
           <CardContent>
-            <VideoPlayer videoUrl={data.videoUrl} />
+            <VideoPlayer videoUrl={data.videoUrl} showAnalysisOverlay={true} />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Detailed Breakdown</CardTitle>
-            <CardDescription>Key metrics from your swing analysis</CardDescription>
+            <CardTitle>Ball Flight Analysis</CardTitle>
+            <CardDescription>Predicted ball flight characteristics</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <Clock className="w-6 h-6 text-primary mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900">{data.scores.tempo}</div>
-                <div className="text-sm text-gray-600">Tempo Score</div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <ArrowRight className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">{data.ballFlight.distance}y</div>
+                <div className="text-sm text-gray-600">Carry Distance</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <User className="w-6 h-6 text-primary mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900">{data.scores.posture}</div>
-                <div className="text-sm text-gray-600">Posture Score</div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <Crosshair className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">{data.ballFlight.accuracy}%</div>
+                <div className="text-sm text-gray-600">Accuracy</div>
               </div>
             </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{data.scores.followThrough}</div>
-              <div className="text-sm text-gray-600">Follow Through Score</div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Ball Spin</span>
+                <div className="text-right">
+                  <span className={`text-sm font-semibold ${getSpinDescription(data.ballFlight.spin).color}`}>
+                    {data.ballFlight.spin} RPM
+                  </span>
+                  <div className="text-xs text-gray-500">{getSpinDescription(data.ballFlight.spin).desc}</div>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Launch Angle</span>
+                <div className="text-right">
+                  <span className={`text-sm font-semibold ${getLaunchDescription(data.ballFlight.launch).color}`}>
+                    {data.ballFlight.launch}°
+                  </span>
+                  <div className="text-xs text-gray-500">{getLaunchDescription(data.ballFlight.launch).label}</div>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Ball Straightness</span>
+                <div className="text-right">
+                  <span className={`text-sm font-semibold ${getScoreColor(data.ballFlight.straightness)}`}>
+                    {data.ballFlight.straightness}/100
+                  </span>
+                  <div className="text-xs text-gray-500">
+                    {data.ballFlight.straightness >= 85 ? 'Very Straight' : 
+                     data.ballFlight.straightness >= 70 ? 'Slight Curve' : 'Significant Curve'}
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Detailed Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Clock className="w-4 h-4 mr-2 text-primary" />
+              Tempo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.scores.tempo}/100</div>
+            <Progress value={data.scores.tempo} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {data.scores.tempo >= 85 ? 'Excellent rhythm' : 
+               data.scores.tempo >= 70 ? 'Good timing' : 'Work on consistency'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <User className="w-4 h-4 mr-2 text-primary" />
+              Posture
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.scores.posture}/100</div>
+            <Progress value={data.scores.posture} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {data.scores.posture >= 85 ? 'Perfect setup' : 
+               data.scores.posture >= 70 ? 'Good alignment' : 'Adjust stance'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Zap className="w-4 h-4 mr-2 text-primary" />
+              Impact
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.impactPosition}/100</div>
+            <Progress value={data.swingMetrics.impactPosition} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {data.swingMetrics.impactPosition >= 85 ? 'Solid contact' : 
+               data.swingMetrics.impactPosition >= 70 ? 'Good strike' : 'Improve contact'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center">
+              <Activity className="w-4 h-4 mr-2 text-primary" />
+              Weight Transfer
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold mb-2">{data.swingMetrics.weightTransfer}/100</div>
+            <Progress value={data.swingMetrics.weightTransfer} className="h-2 mb-2" />
+            <p className="text-xs text-gray-600">
+              {data.swingMetrics.weightTransfer >= 85 ? 'Excellent shift' : 
+               data.swingMetrics.weightTransfer >= 70 ? 'Good transfer' : 'Work on balance'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Swing Mechanics Breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Swing Mechanics Analysis</CardTitle>
+          <CardDescription>Detailed breakdown of your swing components</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Backswing Analysis</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Backswing Length</span>
+                  <span className="font-semibold">{data.swingMetrics.backswingLength}°</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Shoulder Turn</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">Optimal</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Hip Rotation</span>
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Good</Badge>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Downswing Analysis</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Club Head Speed</span>
+                  <span className="font-semibold">{data.swingMetrics.downswingSpeed} mph</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Swing Path</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">On Plane</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Face Angle</span>
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Slightly Open</Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* AI Feedback */}
       <Card>
         <CardHeader>
-          <CardTitle>AI-Powered Feedback</CardTitle>
-          <CardDescription>Personalized tips to improve your swing</CardDescription>
+          <CardTitle>AI-Powered Feedback & Recommendations</CardTitle>
+          <CardDescription>Personalized tips to improve your swing based on comprehensive analysis</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -189,6 +371,19 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
                 </div>
               </div>
             ))}
+            
+            {/* Additional specific recommendations */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h5 className="font-semibold text-blue-900 mb-2 flex items-center">
+                <Wind className="w-4 h-4 mr-2" />
+                Ball Flight Recommendations
+              </h5>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Your ball spin is {data.ballFlight.spin} RPM - {getSpinDescription(data.ballFlight.spin).desc.toLowerCase()}</li>
+                <li>• Launch angle of {data.ballFlight.launch}° is {getLaunchDescription(data.ballFlight.launch).label.toLowerCase()}</li>
+                <li>• Ball straightness score suggests {data.ballFlight.straightness >= 85 ? 'excellent' : data.ballFlight.straightness >= 70 ? 'good' : 'room for improvement in'} directional control</li>
+              </ul>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -202,6 +397,10 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
         <Button variant="outline" size="lg" className="px-8">
           <TrendingUp className="w-4 h-4 mr-2" />
           View Progress
+        </Button>
+        <Button variant="outline" size="lg" className="px-8">
+          <RotateCw className="w-4 h-4 mr-2" />
+          Compare Swings
         </Button>
       </div>
     </div>
