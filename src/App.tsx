@@ -48,6 +48,74 @@ function App() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null)
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  
+  // Mock previous swings data for comparison
+  const [previousSwings] = useState<AnalysisData[]>([
+    {
+      id: 'swing-1',
+      videoUrl: '/mock-video-1.mp4',
+      timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+      scores: {
+        tempo: 78,
+        posture: 82,
+        followThrough: 75,
+        ballStriking: 80,
+        swingPlane: 77,
+        clubFace: 73,
+        overall: 78
+      },
+      ballFlight: {
+        distance: 235,
+        accuracy: 78,
+        spin: 2800,
+        launch: 12,
+        straightness: 82
+      },
+      swingMetrics: {
+        backswingLength: 105,
+        downswingSpeed: 92,
+        impactPosition: 85,
+        weightTransfer: 78,
+        attackAngle: -2.1,
+        swingPath: 1.8,
+        clubFaceAngle: 2.3,
+        smashFactor: 1.35
+      },
+      feedback: ['Previous swing analysis']
+    },
+    {
+      id: 'swing-2',
+      videoUrl: '/mock-video-2.mp4',
+      timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
+      scores: {
+        tempo: 72,
+        posture: 79,
+        followThrough: 68,
+        ballStriking: 75,
+        swingPlane: 71,
+        clubFace: 69,
+        overall: 72
+      },
+      ballFlight: {
+        distance: 220,
+        accuracy: 72,
+        spin: 3200,
+        launch: 10,
+        straightness: 75
+      },
+      swingMetrics: {
+        backswingLength: 98,
+        downswingSpeed: 88,
+        impactPosition: 78,
+        weightTransfer: 72,
+        attackAngle: -1.8,
+        swingPath: 2.5,
+        clubFaceAngle: 3.1,
+        smashFactor: 1.28
+      },
+      feedback: ['Earlier swing analysis']
+    }
+  ])
 
   const handleVideoUpload = (videoUrl: string) => {
     setUploadedVideo(videoUrl)
@@ -229,7 +297,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="results" className="space-y-6">
-            {analysisData && <AnalysisResults data={analysisData} />}
+            {analysisData && <AnalysisResults data={analysisData} previousSwings={previousSwings} />}
           </TabsContent>
 
           <TabsContent value="progress" className="space-y-6">

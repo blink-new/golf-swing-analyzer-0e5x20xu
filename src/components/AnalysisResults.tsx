@@ -4,6 +4,9 @@ import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { VideoPlayer } from './VideoPlayer'
 import { SwingTempoAnalyzer } from './SwingTempoAnalyzer'
+import SwingComparison from './SwingComparison'
+import SwingVisualization3D from './SwingVisualization3D'
+import CoachingRecommendations from './CoachingRecommendations'
 import { 
   Target, 
   Clock, 
@@ -61,9 +64,10 @@ interface AnalysisData {
 
 interface AnalysisResultsProps {
   data: AnalysisData
+  previousSwings?: AnalysisData[]
 }
 
-export function AnalysisResults({ data }: AnalysisResultsProps) {
+export function AnalysisResults({ data, previousSwings = [] }: AnalysisResultsProps) {
   const getScoreColor = (score: number) => {
     if (score >= 85) return 'text-green-600'
     if (score >= 70) return 'text-yellow-600'
@@ -248,6 +252,56 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
 
       {/* Swing Tempo Analysis */}
       <SwingTempoAnalyzer videoUrl={data.videoUrl} />
+
+      {/* 3D Swing Visualization */}
+      <SwingVisualization3D 
+        swingData={{
+          tempo: data.scores.tempo,
+          posture: data.scores.posture,
+          followThrough: data.scores.followThrough,
+          attackAngle: data.swingMetrics.attackAngle,
+          swingPath: data.swingMetrics.swingPath,
+          clubFaceAngle: data.swingMetrics.clubFaceAngle
+        }}
+      />
+
+      {/* Swing Comparison */}
+      {previousSwings.length > 0 && (
+        <SwingComparison 
+          currentSwing={{
+            id: data.id,
+            date: data.timestamp.toLocaleDateString(),
+            tempo: data.scores.tempo,
+            posture: data.scores.posture,
+            followThrough: data.scores.followThrough,
+            ballStriking: data.scores.ballStriking,
+            ballSpin: data.ballFlight.spin,
+            ballStraightness: data.ballFlight.straightness,
+            attackAngle: data.swingMetrics.attackAngle,
+            swingPath: data.swingMetrics.swingPath,
+            clubFaceAngle: data.swingMetrics.clubFaceAngle,
+            smashFactor: data.swingMetrics.smashFactor,
+            clubHeadSpeed: data.swingMetrics.downswingSpeed,
+            carryDistance: data.ballFlight.distance
+          }}
+          previousSwings={previousSwings.map(swing => ({
+            id: swing.id,
+            date: swing.timestamp.toLocaleDateString(),
+            tempo: swing.scores.tempo,
+            posture: swing.scores.posture,
+            followThrough: swing.scores.followThrough,
+            ballStriking: swing.scores.ballStriking,
+            ballSpin: swing.ballFlight.spin,
+            ballStraightness: swing.ballFlight.straightness,
+            attackAngle: swing.swingMetrics.attackAngle,
+            swingPath: swing.swingMetrics.swingPath,
+            clubFaceAngle: swing.swingMetrics.clubFaceAngle,
+            smashFactor: swing.swingMetrics.smashFactor,
+            clubHeadSpeed: swing.swingMetrics.downswingSpeed,
+            carryDistance: swing.ballFlight.distance
+          }))}
+        />
+      )}
 
       {/* Detailed Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -438,38 +492,41 @@ export function AnalysisResults({ data }: AnalysisResultsProps) {
         </CardContent>
       </Card>
 
-      {/* AI Feedback */}
-      <Card>
-        <CardHeader>
-          <CardTitle>AI-Powered Feedback & Recommendations</CardTitle>
-          <CardDescription>Personalized tips to improve your swing based on comprehensive analysis</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {data.feedback.map((tip, index) => (
-              <div key={index} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
-                {getFeedbackIcon(tip)}
-                <div className="flex-1">
-                  <p className="text-gray-900">{tip}</p>
-                </div>
-              </div>
-            ))}
-            
-            {/* Additional specific recommendations */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h5 className="font-semibold text-blue-900 mb-2 flex items-center">
-                <Wind className="w-4 h-4 mr-2" />
-                Ball Flight Recommendations
-              </h5>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Your ball spin is {data.ballFlight.spin} RPM - {getSpinDescription(data.ballFlight.spin).desc.toLowerCase()}</li>
-                <li>• Launch angle of {data.ballFlight.launch}° is {getLaunchDescription(data.ballFlight.launch).label.toLowerCase()}</li>
-                <li>• Ball straightness score suggests {data.ballFlight.straightness >= 85 ? 'excellent' : data.ballFlight.straightness >= 70 ? 'good' : 'room for improvement in'} directional control</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Comprehensive Coaching Recommendations */}
+      <CoachingRecommendations 
+        swingData={{
+          tempo: data.scores.tempo,
+          posture: data.scores.posture,
+          followThrough: data.scores.followThrough,
+          ballStriking: data.scores.ballStriking,
+          ballSpin: data.ballFlight.spin,
+          ballStraightness: data.ballFlight.straightness,
+          attackAngle: data.swingMetrics.attackAngle,
+          swingPath: data.swingMetrics.swingPath,
+          clubFaceAngle: data.swingMetrics.clubFaceAngle,
+          smashFactor: data.swingMetrics.smashFactor,
+          clubHeadSpeed: data.swingMetrics.downswingSpeed,
+          carryDistance: data.ballFlight.distance,
+          backswingLength: data.swingMetrics.backswingLength,
+          weightTransfer: data.swingMetrics.weightTransfer
+        }}
+        previousSwings={previousSwings.map(swing => ({
+          tempo: swing.scores.tempo,
+          posture: swing.scores.posture,
+          followThrough: swing.scores.followThrough,
+          ballStriking: swing.scores.ballStriking,
+          ballSpin: swing.ballFlight.spin,
+          ballStraightness: swing.ballFlight.straightness,
+          attackAngle: swing.swingMetrics.attackAngle,
+          swingPath: swing.swingMetrics.swingPath,
+          clubFaceAngle: swing.swingMetrics.clubFaceAngle,
+          smashFactor: swing.swingMetrics.smashFactor,
+          clubHeadSpeed: swing.swingMetrics.downswingSpeed,
+          carryDistance: swing.ballFlight.distance,
+          backswingLength: swing.swingMetrics.backswingLength,
+          weightTransfer: swing.swingMetrics.weightTransfer
+        }))}
+      />
 
       {/* Action Buttons */}
       <div className="flex justify-center space-x-4">
